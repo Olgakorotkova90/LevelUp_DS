@@ -33,8 +33,8 @@ class HabrNewsSpider(scrapy.Spider):
 
     def parse_item_news(self, response):
         author = response.css('a.user-info__nickname::text')[0].root.strip()
-        author_rating = response.css('a.user-info__stats-item:first-child div.stacked-counter__value::text')[0].root.strip()
-        author_karma = response.css('a.stacked-counter_rating div.stacked-counter__value::text')[0].root.strip()
+        author_karma = response.css('a.user-info__stats-item:first-child div.stacked-counter__value::text')
+        author_rating = response.css('a.stacked-counter_rating div.stacked-counter__value::text')
         author_specialization = response.css('div.user-info__specialization::text')[0].root.strip()
         comments_counter = response.css('#comments_count::text')[0].root.strip()
         title = response.css('span.post__title-text::text')[0].root.strip()
@@ -51,10 +51,10 @@ class HabrNewsSpider(scrapy.Spider):
 
         item = HabrNewsItem()
         item['author'] = author
-        item['author_karma'] = float(author_karma.replace(',', '.')
-                                                 .replace('\U00002013', '-'))
-        item['author_rating'] = float(author_rating.replace(',', '.')
-                                                .replace('\U00002013', '-'))
+        if author_karma:
+            item['author_karma'] = float(author_karma[0].root.strip().replace(',', '.').replace('\U00002013', '-'))
+        if author_rating:
+            item['author_rating'] = float(author_rating[0].root.strip().replace(',', '.').replace('\U00002013', '-'))
         item['author_specialization'] = author_specialization
         item['comments_counter'] = int(comments_counter.replace(',', '.')
                                        .replace('\xa0', ''))
